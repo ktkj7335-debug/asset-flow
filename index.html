@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aplikasi Peminjaman Inventaris TKJ</title>
+<style>
+:root {
+  --primary: #1abc9c;
+  --secondary: #3498db;
+  --dark-bg: #0b132b;
+  --dark-card: #1c2541;
+  --dark-text: #e0e6ed;
+  --light-bg: #e8f6ff;
+  --light-card: #ffffff;
+  --light-text: #333;
+}
+
+body {
+  margin: 0;
+  font-family: "Poppins", sans-serif;
+  background: var(--light-bg);
+  color: var(--light-text);
+  transition: 0.4s;
+  overflow-x: hidden;
+}
+
+body.dark {
+  background: var(--dark-bg);
+  color: var(--dark-text);
+}
+
+.container {
+  max-width: 500px;
+  margin: 70px auto;
+  background: var(--light-card);
+  padding: 25px;
+  border-radius: 15px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  text-align: center;
+  transition: 0.4s;
+}
+
+body.dark .container {
+  background: var(--dark-card);
+  box-shadow: 0 4px 20px rgba(0,255,255,0.2);
+}
+
+h2 {
+  color: var(--secondary);
+}
+
+input, select {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  border: none;
+  border-radius: 8px;
+  background: #f1f1f1;
+}
+
+body.dark input, body.dark select {
+  background: #3a506b;
+  color: var(--dark-text);
+}
+
+button {
+  background: var(--primary);
+  color: white;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+button:hover {
+  background: var(--secondary);
+}
+
+#mainApp { display: none; }
+
+.theme-toggle {
+  position: fixed;
+  top: 15px;
+  right: 20px;
+  background: var(--secondary);
+  border: none;
+  color: #fff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  cursor: pointer;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+}
+
+.stars {
+  position: fixed;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
+  z-index: -1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: fall 2s linear infinite;
+}
+
+@keyframes fall {
+  from {transform: translateY(-10px);}
+  to {transform: translateY(100vh);}
+}
+
+.table {
+  width: 100%;
+  margin-top: 15px;
+  border-collapse: collapse;
+}
+
+.table th, .table td {
+  border-bottom: 1px solid #ccc;
+  padding: 8px;
+}
+
+body.dark .table th, body.dark .table td {
+  border-color: #3a506b;
+}
+
+img.preview {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  object-fit: cover;
+  cursor: pointer;
+}
+
+/* Modal untuk preview foto */
+#imgModal {
+  display: none;
+  position: fixed;
+  z-index: 99;
+  left: 0; top: 0;
+  width: 100%; height: 100%;
+  background-color: rgba(0,0,0,0.8);
+}
+
+#imgModal img {
+  display: block;
+  margin: 80px auto;
+  max-width: 90%;
+  max-height: 80%;
+  border: 3px solid #fff;
+  border-radius: 10px;
+}
+
+#imgModal span {
+  position: absolute;
+  top: 30px;
+  right: 40px;
+  color: white;
+  font-size: 40px;
+  cursor: pointer;
+}
+
+.logo {
+  font-size: 22px;
+  font-weight: bold;
+  color: var(--primary);
+  margin-bottom: 15px;
+}
+
+</style>
+</head>
+<body>
+
+<!-- Tombol ganti tema -->
+<button class="theme-toggle" id="themeBtn">☀️</button>
+<div class="stars" id="stars"></div>
+
+<div class="container" id="loginPage">
+  <div class="logo">⚙️ TKJ INVENTARIS</div>
+  <h2>Login</h2>
+  <input type="text" id="username" placeholder="Username"><br>
+  <input type="password" id="password" placeholder="Password"><br>
+  <button onclick="login()">Masuk</button>
+</div>
+
+<div class="container" id="mainApp">
+  <div class="logo">⚙️ Inventaris Peralatan TKJ</div>
+  <h3>Form Peminjaman Barang</h3>
+  <input type="text" id="peminjam" placeholder="Nama Peminjam">
+  <input type="text" id="kelas" placeholder="Kelas">
+  <input type="text" id="barang" placeholder="Nama Barang">
+  <input type="date" id="tanggal">
+  <label>Foto Sebelum Pinjam:</label><br>
+  <input type="file" id="fotoPinjam" accept="image/*"><br><br>
+  <button onclick="simpanData()">Simpan Data</button>
+
+  <h3>Pengembalian Barang</h3>
+  <select id="selectPeminjam">
+    <option value="">Pilih peminjam</option>
+  </select><br>
+  <label>Tanggal Kembali:</label><br>
+  <input type="date" id="tglKembali">
+  <label>Foto Saat Mengembalikan:</label><br>
+  <input type="file" id="fotoKembali" accept="image/*"><br><br>
+  <button onclick="kembalikan()">Kembalikan Barang</button>
+
+  <h3>Data Peminjaman</h3>
+  <table class="table" id="dataTable">
+    <thead>
+      <tr><th>Nama</th><th>Kelas</th><th>Barang</th><th>Tanggal Pinjam</th><th>Foto</th><th>Tgl Kembali</th><th>Foto Kembali</th></tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- Modal Preview Foto -->
+<div id="imgModal">
+  <span onclick="closeModal()">&times;</span>
+  <img id="modalImg" src="">
+</div>
+
+<script>
+// LOGIN
+function login() {
+  const user = document.getElementById('username').value.trim();
+  const pass = document.getElementById('password').value.trim();
+  if (user === "roup" && pass === "roup") {
+    document.getElementById('loginPage').style.display = "none";
+    document.getElementById('mainApp').style.display = "block";
+  } else {
+    alert("Username / Password salah!");
+  }
+}
+
+// Set tanggal otomatis
+document.getElementById('tanggal').valueAsDate = new Date();
+
+// Simpan data ke localStorage
+function simpanData() {
+  const nama = document.getElementById('peminjam').value;
+  const kelas = document.getElementById('kelas').value;
+  const barang = document.getElementById('barang').value;
+  const tgl = document.getElementById('tanggal').value;
+  const foto = document.getElementById('fotoPinjam').files[0];
+
+  if (!nama || !kelas || !barang || !foto) {
+    alert("Isi semua data dan foto terlebih dahulu!");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
+    data.push({
+      nama, kelas, barang, tgl,
+      fotoPinjam: e.target.result,
+      tglKembali: "",
+      fotoKembali: ""
+    });
+    localStorage.setItem("peminjaman", JSON.stringify(data));
+    tampilData();
+    updateSelect();
+    alert("Data berhasil disimpan!");
+  };
+  reader.readAsDataURL(foto);
+}
+
+// Menampilkan data
+function tampilData() {
+  const tbody = document.querySelector("#dataTable tbody");
+  tbody.innerHTML = "";
+  const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
+
+  data.forEach((d, i) => {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td>${d.nama}</td>
+      <td>${d.kelas}</td>
+      <td>${d.barang}</td>
+      <td>${d.tgl}</td>
+      <td><img src="${d.fotoPinjam}" class="preview" onclick="openModal('${d.fotoPinjam}')"></td>
+      <td>${d.tglKembali || "-"}</td>
+      <td>${d.fotoKembali ? `<img src="${d.fotoKembali}" class="preview" onclick="openModal('${d.fotoKembali}')">` : "-"}</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+// Kembalikan barang
+function kembalikan() {
+  const nama = document.getElementById("selectPeminjam").value;
+  const tgl = document.getElementById("tglKembali").value;
+  const foto = document.getElementById("fotoKembali").files[0];
+
+  if (!nama || !tgl || !foto) {
+    alert("Lengkapi semua data pengembalian!");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    let data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
+    const index = data.findIndex(x => x.nama === nama);
+    if (index !== -1) {
+      data[index].tglKembali = tgl;
+      data[index].fotoKembali = e.target.result;
+    }
+    localStorage.setItem("peminjaman", JSON.stringify(data));
+    tampilData();
+    alert("Barang telah dikembalikan!");
+  };
+  reader.readAsDataURL(foto);
+}
+
+// Dropdown peminjam
+function updateSelect() {
+  const select = document.getElementById("selectPeminjam");
+  select.innerHTML = `<option value="">Pilih peminjam</option>`;
+  const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
+  data.forEach(d => {
+    const opt = document.createElement("option");
+    opt.value = d.nama;
+    opt.textContent = d.nama;
+    select.appendChild(opt);
+  });
+}
+
+// Tema gelap / terang
+document.getElementById("themeBtn").onclick = function() {
+  document.body.classList.toggle("dark");
+  this.textContent = document.body.classList.contains("dark") ? "🌙" : "☀️";
+};
+
+// Modal foto
+function openModal(src) {
+  document.getElementById("modalImg").src = src;
+  document.getElementById("imgModal").style.display = "block";
+}
+
+function closeModal() {
+  document.getElementById("imgModal").style.display = "none";
+}
+
+// Bintang jatuh
+function createStars() {
+  const container = document.getElementById("stars");
+  for (let i = 0; i < 40; i++) {
+    const star = document.createElement("div");
+    star.classList.add("star");
+    star.style.left = Math.random() * 100 + "%";
+    star.style.width = star.style.height = Math.random() * 3 + "px";
+    star.style.animationDuration = (Math.random() * 2 + 1) + "s";
+    star.style.opacity = Math.random();
+    star.style.background = "linear-gradient(white, cyan)";
+    container.appendChild(star);
+  }
+}
+
+createStars();
+tampilData();
+updateSelect();
+</script>
+
+</body>
+</html>
