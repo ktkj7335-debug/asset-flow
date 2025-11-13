@@ -212,7 +212,7 @@ img.preview {
   <h3>Data Peminjaman</h3>
   <table class="table" id="dataTable">
     <thead>
-      <tr><th>Nama</th><th>Kelas</th><th>Barang</th><th>Tanggal Pinjam</th><th>Foto</th><th>Tgl Kembali</th><th>Foto Kembali</th></tr>
+      <tr><th>Nama</th><th>Kelas</th><th>Barang</th><th>Tanggal Pinjam</th><th>Jam</th><th>Foto</th><th>Tgl Kembali</th><th>Foto Kembali</th><th>Aksi</th></tr>
     </thead>
     <tbody></tbody>
   </table>
@@ -247,6 +247,7 @@ function simpanData() {
   const barang = document.getElementById('barang').value;
   const tgl = document.getElementById('tanggal').value;
   const foto = document.getElementById('fotoPinjam').files[0];
+  const jam = new Date().toLocaleTimeString("id-ID", {hour: '2-digit', minute:'2-digit', second:'2-digit'});
 
   if (!nama || !kelas || !barang || !foto) {
     alert("Isi semua data dan foto terlebih dahulu!");
@@ -257,7 +258,7 @@ function simpanData() {
   reader.onload = function(e) {
     const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
     data.push({
-      nama, kelas, barang, tgl,
+      nama, kelas, barang, tgl, jam,
       fotoPinjam: e.target.result,
       tglKembali: "",
       fotoKembali: ""
@@ -266,6 +267,11 @@ function simpanData() {
     tampilData();
     updateSelect();
     alert("Data berhasil disimpan!");
+    // 🧹 Bersihkan form setelah input
+    document.getElementById('peminjam').value = "";
+    document.getElementById('kelas').value = "";
+    document.getElementById('barang').value = "";
+    document.getElementById('fotoPinjam').value = "";
   };
   reader.readAsDataURL(foto);
 }
@@ -283,15 +289,45 @@ function tampilData() {
       <td>${d.kelas}</td>
       <td>${d.barang}</td>
       <td>${d.tgl}</td>
+      <td>${d.jam || "-"}</td>
       <td><img src="${d.fotoPinjam}" class="preview" onclick="openModal('${d.fotoPinjam}')"></td>
       <td>${d.tglKembali || "-"}</td>
       <td>${d.fotoKembali ? `<img src="${d.fotoKembali}" class="preview" onclick="openModal('${d.fotoKembali}')">` : "-"}</td>
+      <td>${!d.tglKembali ? `<button onclick="kembalikanLangsung(${i})">Kembalikan</button>` : "Selesai"}</td>
     `;
     tbody.appendChild(tr);
   });
 }
 
-// Kembalikan barang
+// Kembalikan barang dari tabel langsung
+function kembalikanLangsung(index) {
+  const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
+  const peminjam = data[index];
+  if (!peminjam) return;
+
+  const tgl = prompt("Masukkan tanggal kembali (format: YYYY-MM-DD):", new Date().toISOString().split('T')[0]);
+  if (!tgl) return alert("Tanggal kembali wajib diisi!");
+
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = function(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function(ev) {
+      data[index].tglKembali = tgl;
+      data[index].fotoKembali = ev.target.result;
+      localStorage.setItem("peminjaman", JSON.stringify(data));
+      tampilData();
+      alert("Barang telah dikembalikan!");
+    };
+    reader.readAsDataURL(file);
+  };
+  input.click();
+}
+
+// Kembalikan barang (versi form lama tetap)
 function kembalikan() {
   const nama = document.getElementById("selectPeminjam").value;
   const tgl = document.getElementById("tglKembali").value;
@@ -323,10 +359,12 @@ function updateSelect() {
   select.innerHTML = `<option value="">Pilih peminjam</option>`;
   const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
   data.forEach(d => {
-    const opt = document.createElement("option");
-    opt.value = d.nama;
-    opt.textContent = d.nama;
-    select.appendChild(opt);
+    if (!d.tglKembali) {
+      const opt = document.createElement("option");
+      opt.value = d.nama;
+      opt.textContent = d.nama;
+      select.appendChild(opt);
+    }
   });
 }
 
