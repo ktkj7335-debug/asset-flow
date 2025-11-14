@@ -1,61 +1,80 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aset Flow TKJ</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Peminjaman Inventaris TKJ</title>
+  <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-<div class="login-box" id="loginBox">
+  <!-- Tombol Tema -->
+  <button class="theme-toggle" id="themeBtn" aria-label="Toggle theme">☀️</button>
+  <div class="stars" id="stars" aria-hidden="true"></div>
+
+  <!-- LOGIN -->
+  <div class="container" id="loginPage">
+    <div class="logo">PEMINJAMAN BARANG TKJ</div>
     <h2>Login</h2>
-    <input type="text" id="username" placeholder="Username: roup">
-    <input type="password" id="password" placeholder="Password: king">
-    <button onclick="login()">Masuk</button>
-</div>
+    <input id="username" placeholder="Username" autocomplete="username">
+    <input type="password" id="password" placeholder="Password" autocomplete="current-password">
+    <button id="loginBtn">Masuk</button>
+  </div>
 
-<div class="container" id="app" style="display:none;">
-    <h1>Aset Flow TKJ</h1>
+  <!-- FORM UTAMA -->
+  <div class="container" id="mainApp" aria-hidden="true">
+    <div class="logo">PEMINJAMAN BARANG TKJ</div>
 
-    <div class="form-box">
-        <h3>Form Peminjaman</h3>
+    <h3>Form Peminjaman Barang</h3>
+    <input id="inputPeminjam" placeholder="Nama Peminjam" />
+    <input id="inputKelas" placeholder="Kelas" />
+    <input id="inputBarang" placeholder="Nama Barang" />
+    <input type="date" id="inputTanggal" />
 
-        <label>Nama Peminjam</label>
-        <input type="text" id="nama">
+    <label for="inputFotoPinjam">Foto Sebelum Pinjam:</label>
+    <input type="file" id="inputFotoPinjam" accept="image/*" />
 
-        <label>Kelas</label>
-        <input type="text" id="kelas">
+    <button id="saveBtn">Simpan Data</button>
 
-        <label>Barang</label>
-        <input type="text" id="barang">
+    <hr>
 
-        <label>Tanggal Peminjaman</label>
-        <input type="date" id="tanggal">
+    <h3>Pengembalian Barang</h3>
+    <select id="selectPeminjam">
+      <option value="">Pilih peminjam</option>
+    </select>
 
-        <button id="btnSimpan" onclick="simpanData()">Simpan</button>
+    <label for="inputTglKembali">Tanggal Kembali:</label>
+    <input type="date" id="inputTglKembali" />
+
+    <label for="inputFotoKembali">Foto Saat Kembali:</label>
+    <input type="file" id="inputFotoKembali" accept="image/*" />
+
+    <button id="returnBtn">Kembalikan</button>
+  </div>
+
+  <!-- TABEL DATA -->
+  <div class="table-container">
+    <h2 style="text-align:center;">Data Peminjaman</h2>
+    <div style="overflow-x:auto;">
+      <table class="table" id="dataTable" aria-live="polite">
+        <thead>
+          <tr>
+            <th>Nama</th><th>Kelas</th><th>Barang</th><th>Tgl Pinjam</th><th>Jam</th><th>Foto</th><th>Tgl Kembali</th><th>Foto Kembali</th><th>Aksi</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
     </div>
+  </div>
 
-    <div class="table-box">
-        <h3>Daftar Peminjaman</h3>
-        <div class="tbl-wrapper">
-            <table id="tabelData">
-                <thead>
-                    <tr>
-                        <th>Nama</th>
-                        <th>Kelas</th>
-                        <th>Barang</th>
-                        <th>Tanggal</th>
-                        <th>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody></tbody>
-            </table>
-        </div>
-    </div>
+  <!-- MODAL FOTO -->
+  <div id="imgModal" aria-hidden="true">
+    <span id="closeModalBtn" role="button" aria-label="Tutup">&times;</span>
+    <img id="modalImg" alt="Preview foto">
+  </div>
 
-</div>
-
-<script src="script.js"></script>
+  <!-- JS -->
+  <!-- app.js dimuat dengan defer agar DOM sudah siap, cocok untuk GitHub Pages -->
+  <script src="app.js" defer></script>
 </body>
 </html>
