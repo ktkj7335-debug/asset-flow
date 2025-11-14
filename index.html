@@ -1,68 +1,82 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Peminjaman Barang TKJ</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Peminjaman Inventaris TKJ</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <div class="app-bg"></div>
 
-<div class="stars"></div>
+  <header class="topbar">
+    <div class="brand">PEMINJAMAN BARANG TKJ</div>
+    <div class="subtitle">Sistem sederhana - localStorage</div>
+  </header>
 
-<h1>Peminjaman Barang TKJ</h1>
+  <main class="main">
+    <!-- LOGIN -->
+    <section class="card login-card" id="loginCard" aria-live="polite">
+      <h2>Masuk</h2>
+      <label class="sr-only" for="username">Username</label>
+      <input id="username" placeholder="Username" autocomplete="username">
 
-<!-- LOGIN -->
-<div class="login-box">
-  <h2>Login</h2>
-  <input type="text" id="username" placeholder="Username">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Masuk</button>
-</div>
+      <label class="sr-only" for="password">Password</label>
+      <input id="password" type="password" placeholder="Password" autocomplete="current-password">
 
-<!-- FORM PEMINJAMAN -->
-<div id="main" style="display:none;">
+      <button id="loginBtn">Masuk</button>
+      <div class="hint">Username: <b>king</b> • Password: <b>roup</b></div>
+    </section>
 
-  <h2>Form Peminjaman Barang</h2>
+    <!-- Aplikasi -->
+    <section class="layout" id="appArea" style="display:none;">
+      <aside class="card form-card">
+        <h3>Form Peminjaman</h3>
+        <input id="inputPeminjam" placeholder="Nama Peminjam">
+        <input id="inputKelas" placeholder="Kelas (contoh: X TKJ 1)">
+        <input id="inputBarang" placeholder="Nama Barang">
+        <div class="row">
+          <input type="date" id="inputTanggal">
+          <input type="file" id="inputFotoPinjam" accept="image/*">
+        </div>
+        <button id="saveBtn">Simpan Data</button>
 
-  <div class="form-container">
-      <input id="nama" placeholder="Nama Peminjam">
-      <input id="kelas" placeholder="Kelas">
-      <input id="barang" placeholder="Nama Barang">
-      <input type="date" id="tanggal">
-      <input type="file" id="fotoPinjam">
-      <button onclick="simpanData()">Simpan</button>
-  </div>
+        <hr>
 
-  <h2>Pengembalian Barang</h2>
+        <h3>Pengembalian</h3>
+        <select id="selectPeminjam"><option value="">Pilih peminjam</option></select>
+        <input type="date" id="inputTglKembali">
+        <input type="file" id="inputFotoKembali" accept="image/*">
+        <button id="returnBtn">Kembalikan</button>
+      </aside>
 
-  <div class="form-container">
-      <select id="selectPeminjam"></select>
-      <input type="date" id="tanggalKembali">
-      <input type="file" id="fotoKembali">
-      <button onclick="kembalikan()">Kembalikan</button>
-  </div>
-
-  <h2 class="table-title">Data Peminjaman</h2>
-
-  <div class="table-box">
-      <table id="tabelData">
-          <thead>
+      <section class="card table-card">
+        <h3>Data Peminjaman</h3>
+        <div class="table-wrap">
+          <table id="dataTable" aria-live="polite">
+            <thead>
               <tr>
-                  <th>Nama</th>
-                  <th>Kelas</th>
-                  <th>Barang</th>
-                  <th>Tanggal</th>
-                  <th>Foto</th>
-                  <th>Aksi</th>
+                <th>Nama</th><th>Kelas</th><th>Barang</th><th>Tgl Pinjam</th><th>Jam</th><th>Foto</th><th>Tgl Kembali</th><th>Foto Kembali</th><th>Aksi</th>
               </tr>
-          </thead>
-          <tbody></tbody>
-      </table>
+            </thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+  </main>
+
+  <!-- modal preview -->
+  <div id="imgModal" class="img-modal" aria-hidden="true">
+    <div class="img-modal-inner">
+      <button id="closeModal" class="modal-close">&times;</button>
+      <img id="modalImg" src="" alt="Preview">
+    </div>
   </div>
 
-</div>
+  <!-- toast -->
+  <div id="toast" class="toast" aria-hidden="true"></div>
 
-<script src="script.js"></script>
+  <script src="script.js" defer></script>
 </body>
 </html>
