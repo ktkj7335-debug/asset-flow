@@ -3,441 +3,59 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Aplikasi Peminjaman Inventaris TKJ</title>
-
-<style>
-:root {
-  --primary: #1abc9c;
-  --secondary: #3498db;
-  --dark-bg: #0b132b;
-  --dark-card: #1c2541;
-  --dark-text: #e0e6ed;
-  --light-bg: #e8f6ff;
-  --light-card: #ffffff;
-  --light-text: #333;
-}
-
-/* Global */
-body {
-  margin: 0;
-  font-family: "Poppins", sans-serif;
-  background: var(--light-bg);
-  color: var(--light-text);
-  transition: 0.4s;
-}
-
-body.dark {
-  background: var(--dark-bg);
-  color: var(--dark-text);
-}
-
-/* Login + Form Container */
-.container {
-  max-width: 500px;
-  margin: 60px auto;
-  background: var(--light-card);
-  padding: 25px;
-  border-radius: 15px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  transition: 0.4s;
-}
-
-body.dark .container {
-  background: var(--dark-card);
-  box-shadow: 0 4px 20px rgba(0,255,255,0.2);
-}
-
-/* Tabel Container (80%) */
-.table-container {
-  width: 80%;
-  margin: 30px auto;
-  background: var(--light-card);
-  padding: 20px;
-  border-radius: 15px;
-  overflow-x: auto;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-  transition: 0.4s;
-}
-
-body.dark .table-container {
-  background: var(--dark-card);
-}
-
-/* Input & tombol */
-input, select {
-  width: 90%;
-  padding: 10px;
-  margin: 8px 0;
-  border-radius: 8px;
-  border: none;
-  background: #f1f1f1;
-}
-
-body.dark input, body.dark select {
-  background: #3a506b;
-  color: var(--dark-text);
-}
-
-button {
-  background: var(--primary);
-  color: white;
-  border: none;
-  padding: 10px 25px;
-  border-radius: 8px;
-  cursor: pointer;
-  transition: .3s;
-}
-
-button:hover {
-  background: var(--secondary);
-}
-
-#mainApp { display: none; }
-
-/* Stars BG */
-.stars {
-  position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
-  z-index: -1;
-  overflow: hidden;
-}
-.star {
-  position: absolute;
-  background: white;
-  border-radius: 50%;
-  animation: fall 2s linear infinite;
-}
-@keyframes fall {
-  from {transform: translateY(-10px);}
-  to {transform: translateY(100vh);}
-}
-
-/* Tabel */
-.table {
-  width: 100%;
-  border-collapse: collapse;
-  min-width: 700px;
-}
-
-.table th, .table td {
-  padding: 8px;
-  border-bottom: 1px solid #ccc;
-}
-
-body.dark .table th, body.dark .table td {
-  border-color: #3a506b;
-}
-
-img.preview {
-  width: 50px;
-  height: 50px;
-  border-radius: 8px;
-  object-fit: cover;
-  cursor: pointer;
-}
-
-/* Modal Foto */
-#imgModal {
-  display: none;
-  position: fixed;
-  z-index: 999;
-  left: 0; top: 0;
-  width: 100%; height: 100%;
-  background: rgba(0,0,0,0.9);
-}
-#imgModal img {
-  display: block;
-  margin: 80px auto;
-  max-width: 90%;
-  max-height: 80%;
-}
-#imgModal span {
-  position: absolute;
-  top: 20px; right: 30px;
-  color: white;
-  font-size: 40px;
-  cursor: pointer;
-}
-
-.logo {
-  font-size: 22px;
-  font-weight: bold;
-  color: var(--primary);
-  margin-bottom: 10px;
-}
-
-/* Tombol dark mode */
-.theme-toggle {
-  position: fixed;
-  top: 15px;
-  right: 20px;
-  background: var(--secondary);
-  color: #fff;
-  border: none;
-  border-radius: 50%;
-  width: 45px;
-  height: 45px;
-  font-size: 20px;
-  cursor: pointer;
-}
-
-</style>
+<title>Aset Flow TKJ</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<!-- Tombol Tema -->
-<button class="theme-toggle" id="themeBtn">☀️</button>
-<div class="stars" id="stars"></div>
-
-<!-- LOGIN -->
-<div class="container" id="loginPage">
-  <div class="logo">PEMINJAMAN BARANG TKJ</div>
-  <h2>Login</h2>
-  <input id="username" placeholder="Username">
-  <input type="password" id="password" placeholder="Password">
-  <button onclick="login()">Masuk</button>
+<div class="login-box" id="loginBox">
+    <h2>Login</h2>
+    <input type="text" id="username" placeholder="Username: roup">
+    <input type="password" id="password" placeholder="Password: king">
+    <button onclick="login()">Masuk</button>
 </div>
 
-<!-- FORM UTAMA -->
-<div class="container" id="mainApp">
-  <div class="logo">PEMINJAMAN BARANG TKJ</div>
+<div class="container" id="app" style="display:none;">
+    <h1>Aset Flow TKJ</h1>
 
-  <h3>Form Peminjaman Barang</h3>
-  <input id="peminjam" placeholder="Nama Peminjam">
-  <input id="kelas" placeholder="Kelas">
-  <input id="barang" placeholder="Nama Barang">
-  <input type="date" id="tanggal">
+    <div class="form-box">
+        <h3>Form Peminjaman</h3>
 
-  <label>Foto Sebelum Pinjam:</label>
-  <input type="file" id="fotoPinjam" accept="image/*">
+        <label>Nama Peminjam</label>
+        <input type="text" id="nama">
 
-  <button onclick="simpanData()">Simpan</button>
+        <label>Kelas</label>
+        <input type="text" id="kelas">
 
-  <hr>
+        <label>Barang</label>
+        <input type="text" id="barang">
 
-  <h3>Pengembalian Barang</h3>
-  <select id="selectPeminjam">
-    <option value="">Pilih peminjam</option>
-  </select>
+        <label>Tanggal Peminjaman</label>
+        <input type="date" id="tanggal">
 
-  <label>Tanggal Kembali:</label>
-  <input type="date" id="tglKembali">
+        <button id="btnSimpan" onclick="simpanData()">Simpan</button>
+    </div>
 
-  <label>Foto Saat Kembali:</label>
-  <input type="file" id="fotoKembali" accept="image/*">
+    <div class="table-box">
+        <h3>Daftar Peminjaman</h3>
+        <div class="tbl-wrapper">
+            <table id="tabelData">
+                <thead>
+                    <tr>
+                        <th>Nama</th>
+                        <th>Kelas</th>
+                        <th>Barang</th>
+                        <th>Tanggal</th>
+                        <th>Aksi</th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
 
-  <button onclick="kembalikan()">Kembalikan</button>
 </div>
 
-<!-- TABEL DATA -->
-<div class="table-container">
-  <h2 style="text-align:center;">Data Peminjaman</h2>
-  <div style="overflow-x:auto;">
-    <table class="table" id="dataTable">
-      <thead>
-        <tr>
-          <th>Nama</th>
-          <th>Kelas</th>
-          <th>Barang</th>
-          <th>Tgl Pinjam</th>
-          <th>Jam</th>
-          <th>Foto</th>
-          <th>Tgl Kembali</th>
-          <th>Foto Kembali</th>
-          <th>Aksi</th>
-        </tr>
-      </thead>
-      <tbody></tbody>
-    </table>
-  </div>
-</div>
-
-<!-- MODAL FOTO -->
-<div id="imgModal">
-  <span onclick="closeModal()">&times;</span>
-  <img id="modalImg">
-</div>
-
-<script>
-/* LOGIN */
-function login() {
-  const u = username.value.trim();
-  const p = password.value.trim();
-  if (u === "roup" && p === "roup") {
-    loginPage.style.display = "none";
-    mainApp.style.display = "block";
-  } else alert("Username / Password salah!");
-}
-
-/* SET TANGGAL OTOMATIS */
-tanggal.valueAsDate = new Date();
-
-/* SIMPAN DATA */
-function simpanData() {
-  const nama = peminjam.value.trim();
-  const kelas = kelas.value.trim();
-  const barang = barang.value.trim();
-  const tgl = tanggal.value;
-  const foto = fotoPinjam.files[0];
-  const jam = new Date().toLocaleTimeString("id-ID");
-
-  if (!nama || !kelas || !barang || !foto) {
-    alert("Lengkapi semua data!"); return;
-  }
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
-
-    data.push({
-      nama, kelas, barang, tgl, jam,
-      fotoPinjam: e.target.result,
-      tglKembali: "",
-      fotoKembali: ""
-    });
-
-    localStorage.setItem("peminjaman", JSON.stringify(data));
-    tampilData();
-    updateSelect();
-
-    // reset form
-    peminjam.value = "";
-    kelas.value = "";
-    barang.value = "";
-    fotoPinjam.value = "";
-  };
-  reader.readAsDataURL(foto);
-}
-
-/* TAMPIL DATA */
-function tampilData() {
-  const tbody = document.querySelector("#dataTable tbody");
-  tbody.innerHTML = "";
-  const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
-
-  data.forEach((d, i) => {
-    tbody.innerHTML += `
-    <tr>
-      <td>${d.nama}</td>
-      <td>${d.kelas}</td>
-      <td>${d.barang}</td>
-      <td>${d.tgl}</td>
-      <td>${d.jam}</td>
-      <td><img src="${d.fotoPinjam}" class="preview" onclick="openModal('${d.fotoPinjam}')"></td>
-      <td>${d.tglKembali || "-"}</td>
-      <td>${d.fotoKembali ? `<img src="${d.fotoKembali}" class="preview" onclick="openModal('${d.fotoKembali}')">` : "-"}</td>
-      <td>${!d.tglKembali ? `<button onclick="kembalikanLangsung(${i})">Kembalikan</button>` : "Selesai"}</td>
-    </tr>`;
-  });
-}
-
-/* DROPDOWN */
-function updateSelect() {
-  selectPeminjam.innerHTML = `<option value="">Pilih peminjam</option>`;
-
-  const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
-
-  data.forEach(d => {
-    if (!d.tglKembali) {
-      const opt = document.createElement("option");
-      opt.value = d.nama;
-      opt.textContent = d.nama;
-      selectPeminjam.appendChild(opt);
-    }
-  });
-}
-
-/* KEMBALIKAN VIA FORM */
-function kembalikan() {
-  const nama = selectPeminjam.value;
-  const tgl = tglKembali.value;
-  const file = fotoKembali.files[0];
-
-  if (!nama || !tgl || !file) return alert("Lengkapi semua!");
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
-    const idx = data.findIndex(x => x.nama === nama);
-
-    if (idx !== -1) {
-      data[idx].tglKembali = tgl;
-      data[idx].fotoKembali = e.target.result;
-    }
-
-    localStorage.setItem("peminjaman", JSON.stringify(data));
-    tampilData();
-    updateSelect();
-
-    tglKembali.value = "";
-    fotoKembali.value = "";
-  };
-  reader.readAsDataURL(file);
-}
-
-/* KEMBALIKAN LANGSUNG DARI TABEL */
-function kembalikanLangsung(i) {
-  const tgl = prompt("Tanggal Pengembalian:", new Date().toISOString().split("T")[0]);
-  if (!tgl) return;
-
-  const input = document.createElement("input");
-  input.type = "file";
-  input.accept = "image/*";
-
-  input.onchange = e => {
-    const file = e.target.files[0];
-    if (!file) return;
-
-    const reader = new FileReader();
-    reader.onload = ev => {
-      const data = JSON.parse(localStorage.getItem("peminjaman") || "[]");
-      data[i].tglKembali = tgl;
-      data[i].fotoKembali = ev.target.result;
-
-      localStorage.setItem("peminjaman", JSON.stringify(data));
-
-      tampilData();
-      updateSelect();
-    };
-    reader.readAsDataURL(file);
-  };
-
-  input.click();
-}
-
-/* MODAL */
-function openModal(src) {
-  modalImg.src = src;
-  imgModal.style.display = "block";
-}
-function closeModal() {
-  imgModal.style.display = "none";
-}
-
-/* BINTANG */
-function createStars() {
-  for (let i = 0; i < 40; i++) {
-    let s = document.createElement("div");
-    s.classList.add("star");
-    s.style.left = Math.random() * 100 + "%";
-    s.style.width = s.style.height = Math.random() * 3 + "px";
-    s.style.animationDuration = (Math.random() * 2 + 1) + "s";
-    stars.appendChild(s);
-  }
-}
-createStars();
-
-/* TAMPIKAN DATA AWAL */
-tampilData();
-updateSelect();
-
-/* THEME SWITCH */
-themeBtn.onclick = () => {
-  document.body.classList.toggle("dark");
-  themeBtn.textContent = document.body.classList.contains("dark") ? "🌙" : "☀️";
-};
-</script>
-
+<script src="script.js"></script>
 </body>
 </html>
