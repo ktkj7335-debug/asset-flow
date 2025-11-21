@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Aplikasi Peminjaman Barang</title>
+
+<style>
+:root{
+  --bg:#f4f4f4;
+  --card:#ffffff;
+  --text:#111;
+  --accent:#1fb6a1;
+}
+.dark{
+  --bg:#0f2039;
+  --card:#13273f;
+  --text:#e9f7ff;
+  --accent:#7fe3c8;
+}
+body{
+  margin:0;font-family:Arial;background:var(--bg);color:var(--text);overflow-x:hidden;
+}
+.snow{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:-1;}
+.snow span{position:absolute;top:-10px;width:8px;height:8px;background:white;border-radius:50%;opacity:0.8;animation:snowfall linear infinite;}
+@keyframes snowfall{0%{transform:translateY(0);}100%{transform:translateY(110vh);}}
+.container{max-width:900px;margin:30px auto;padding:20px;background:var(--card);border-radius:10px;box-shadow:0 4px 12px rgba(0,0,0,0.15);}
+input{width:100%;padding:10px;margin:6px 0;border-radius:8px;border:1px solid #ccc;}
+button{padding:10px 15px;border:none;background:var(--accent);color:#fff;border-radius:8px;cursor:pointer;font-weight:bold;}
+table{width:100%;border-collapse:collapse;margin-top:20px;}
+th,td{border:1px solid #ccc;padding:8px;}
+.hidden{display:none;}
+.theme-btn{float:right;margin-top:-20px;margin-right:-10px;}
+</style>
+</head>
+
+<body>
+
+<div class="snow" id="snow"></div>
+<button class="theme-btn" onclick="toggleTheme()">Tema</button>
+
+<div id="loginPage" class="container">
+  <h2 style="text-align:center">Login</h2>
+  <input id="user" placeholder="Username">
+  <input id="pass" placeholder="Password" type="password">
+  <button onclick="login()">Masuk</button>
+</div>
+
+<div id="mainPage" class="container hidden">
+  <h2>Form Peminjaman</h2>
+
+  <label>Nama</label><input id="nama">
+  <label>Kelas</label><input id="kelas">
+  <label>Barang</label><input id="barang">
+  <label>Tanggal</label><input id="tanggal" disabled>
+  <label>Jam</label><input id="jam" disabled>
+
+  <button onclick="tambahPeminjaman()">Pinjam</button>
+  <button onclick="hapusSemua()" style="background:#d9534f;margin-left:10px">Hapus Semua Data</button>
+
+  <h2 style="margin-top:30px;">Data Peminjaman</h2>
+  <table>
+    <thead><tr><th>Nama</th><th>Kelas</th><th>Barang</th><th>Tanggal</th><th>Aksi</th></tr></thead>
+    <tbody id="tabelPinjam"></tbody>
+  </table>
+
+  <h2 style="margin-top:30px;">Sudah Dikembalikan</h2>
+  <table>
+    <thead><tr><th>Nama</th><th>Kelas</th><th>Barang</th><th>Tanggal</th></tr></thead>
+    <tbody id="tabelKembali"></tbody>
+  </table>
+
+  <button style="margin-top:20px" onclick="exportDoc()">Ekspor Dokumen</button>
+</div>
+
+<script>
+function login(){
+  let u=document.getElementById("user").value;
+  let p=document.getElementById("pass").value;
+  if(u==="roup"&&p==="roup"){
+    loginPage.classList.add("hidden");
+    mainPage.classList.remove("hidden");
+    setTanggal();
+  }else alert("Username atau password salah");
+}
+
+function setTanggal(){
+  const t=new Date();
+  tanggal.value=t.getFullYear()+"-"+(t.getMonth()+1)+"-"+t.getDate();
+}
+
+function updateJam(){
+  const t=new Date();
+  jam.value=`${String(t.getHours()).padStart(2,'0')}:${String(t.getMinutes()).padStart(2,'0')}:${String(t.getSeconds()).padStart(2,'0')}`;
+}
+setInterval(updateJam,1000);updateJam();
+
+let pinjam=JSON.parse(localStorage.getItem("pinjam"))||[];
+let kembali=JSON.parse(localStorage.getItem("kembali"))||[];
+
+function simpan(){
+  localStorage.setItem("pinjam",JSON.stringify(pinjam));
+  localStorage.setItem("kembali",JSON.stringify(kembali));
+}
+
+function tambahPeminjaman(){
+  if(!nama.value||!kelas.value||!barang.value){alert("Lengkapi semua data!");return;}
+  pinjam.push({nama:nama.value,kelas:kelas.value,barang:barang.value,tanggal:tanggal.value,jam:jam.value});
+  simpan();render();
+  nama.value="";kelas.value="";barang.value="";
+}
+
+function render(){
+  tabelPinjam.innerHTML=pinjam.map((d,i)=>`
+    <tr>
+      <td>${d.nama}</td><td>${d.kelas}</td><td>${d.barang}</td>
+      <td>${d.tanggal} ${d.jam}</td>
+      <td><button onclick="kembalikan(${i})">Kembalikan</button></td>
+    </tr>`).join("");
+
+  tabelKembali.innerHTML=kembali.map(d=>`
+    <tr>
+      <td>${d.nama}</td><td>${d.kelas}</td><td>${d.barang}</td>
+      <td>${d.tanggal} ${d.jam}</td>
+    </tr>`).join("");
+}
+render();
+
+function kembalikan(i){
+  if(confirm("Konfirmasi dikembalikan?")){
+    let d=pinjam[i];
+    d.jam=jam.value;
+    kembali.push(d);
+    pinjam.splice(i,1);
+    simpan();render();
+  }
+}
+
+function hapusSemua(){
+  if(confirm("Hapus semua data pinjam & kembali?")){
+    pinjam=[];kembali=[];
+    simpan();render();
+    alert("Semua data dihapus.");
+  }
+}
+
+function exportDoc(){
+  let html = `
+  <html>
+  <head>
+    <meta charset="UTF-8">
+    <style>
+      table{border-collapse:collapse;width:100%;}
+      th,td{border:1px solid #000;padding:6px;}
+      th{background:#eee;}
+      h2{text-align:center;}
+    </style>
+  </head>
+  <body>
+    <h2>Rekapan Peminjaman Barang</h2>
+    <table>
+      <tr><th>Nama</th><th>Kelas</th><th>Barang</th><th>Tanggal</th><th>Status</th></tr>
+  `;
+
+  pinjam.forEach(d=>{
+    html+=`<tr><td>${d.nama}</td><td>${d.kelas}</td><td>${d.barang}</td><td>${d.tanggal} ${d.jam}</td><td>Dipinjam</td></tr>`;
+  });
+
+  kembali.forEach(d=>{
+    html+=`<tr><td>${d.nama}</td><td>${d.kelas}</td><td>${d.barang}</td><td>${d.tanggal} ${d.jam}</td><td>Dikembalikan</td></tr>`;
+  });
+
+  html+=`</table></body></html>`;
+
+  let blob=new Blob([html],{type:"application/msword"});
+  let a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="Rekapan_Peminjaman.doc";
+  a.click();
+}
+
+function toggleTheme(){document.body.classList.toggle("dark");}
+
+function buatSalju(){
+  for(let i=0;i<35;i++){
+    let s=document.createElement("span");
+    s.style.left=Math.random()*100+"vw";
+    s.style.animationDuration=(4+Math.random()*6)+"s";
+    s.style.opacity=0.5+Math.random()*0.5;
+    s.style.transform=`scale(${0.5+Math.random()})`;
+    snow.appendChild(s);
+  }
+}
+buatSalju();
+</script>
+</body>
+</html>
